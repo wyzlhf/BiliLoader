@@ -46,7 +46,7 @@ class SubtitleLoader(object):
             cid_part_order_list.append(part_dict)
         return (aid, cid_part_order_list)
 
-    def get_json_url(self) -> None:
+    def get_json_subtitle(self) -> None:
         aid, cid_part_order_list = self.get_video_info()
 
         for cid_part_order_dict in cid_part_order_list:
