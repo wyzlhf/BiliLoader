@@ -1,0 +1,3 @@
+# BiliLoader
+重写了下载B站视频、字幕和json字幕转srt字幕。只需要提供BVID。这次是对you-get方式的优化，彻底放弃了you-get。因为you-get现在太慢，可能是B站限制了。
+里面区分了字幕下载模块，视频下载模块。其中视频下载又区分了playlist视频下载和spaceandchannel视频下载。都是只需要实例化一个对象，然后调用get_xxx_video即可实现视频下载。
