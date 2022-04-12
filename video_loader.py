@@ -1,8 +1,14 @@
 import json
+import re
+import subprocess
 from typing import Union, List, Dict
-
 import requests
+from bs4 import BeautifulSoup, ResultSet  # type: ignore
 from requests import Session, Response
+import os
+from tenacity import retry
+from time import sleep
+from random import randint
 
 
 class SpaceAndChannelVideoLoader(object):
@@ -10,60 +16,104 @@ class SpaceAndChannelVideoLoader(object):
 
 
 class PlaylistVideoLoader(object):
-    '''
-    1、通过传入参数BVID获取整个playlist情况，里面包含该playlist的aid和每个视频的cid，获取方法为：
-        https://api.bilibili.com/x/web-interface/view/detail?bvid=BVID
-
-        补充一种方法，请求https://api.bilibili.com/x/player/pagelist?bvid=BV1KL411K7cH&jsonp=jsonp，也能获取playlist详细信息
-    2、通过
-        https://api.bilibili.com/x/player/playurl?cid=571284384&bvid=BV1f3411J7w4&qn=80&type=&otype=json&fourk=1&fnver=0&fnval=4048
-        代入session的方式请求获取json，里面包含了相应的视频和音频链接，下载最大的即可，后续如果有需要，再可以控制。
-    3、获取baseURL，然后包括上请求的参数，比如reference等，去下载视频，要有标题啊（就是第一步中json的part部分，需要保存下来）
-
-
-    '''
-
     def __init__(self, bvid: str) -> None:
         self.bvid: str = bvid
         self.headers: dict[str, str] = {
-            'referer': f'https://www.bilibili.com/video/{self.bvid}?p=2',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'cross-site',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36'
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+            "referer": "https://message.bilibili.com/"
         }
-        self.playlist_url: str = 'https://api.bilibili.com/x/web-interface/view/detail?bvid='
-        # self.player_url:str=
+        self.base_url: str = f'https://www.bilibili.com/video/{self.bvid}'
+        self.playlist_url: str = f'https://api.bilibili.com/x/web-interface/view/detail?bvid={self.bvid}'
         self.session: Union[Session, Session] = requests.Session()
+        self.plsylist_info: List[Dict] = self.get_playlist_info()
 
-    def get_playlist(self) -> List[Dict[int, str]]:
-        '''
-        获取playlist信息，从里面需要取到每个视频的标题，cid
-        :return:
-        '''
-
-        playlist: Response = self.session.get(self.playlist_url + self.bvid, headers=self.headers)
+    def get_playlist_info(self) -> List[Dict]:
+        playlist: Response = self.session.get(self.playlist_url, headers=self.headers)
         playlist_dict: dict = json.loads(playlist.text)
-        pages: list = playlist_dict["data"]["View"]["pages"]
+        pages: list[dict] = playlist_dict["data"]["View"]["pages"]
+        # pprint(pages)
 
-        playlist_content: List[Dict[int, str]] = []
+        playlist_content: List[Dict] = []
         for page in pages:
             cid: int = page['cid']
             part: str = page['part']
-            cid_part: dict = {'cid': cid, 'part': part}
+            page_url: str = f'{self.base_url}?p={page["page"]}'
+            cid_part: dict = {'cid': cid, 'part': part, 'page': page_url}
             playlist_content.append(cid_part)
-        # print(playlist_content)
+        # pprint(playlist_content)
         return playlist_content
 
-    def get_playurl(self, cid: int = 571284044) -> str:
-        player_url: str = f'https://api.bilibili.com/x/player/playurl?cid={cid}&bvid={self.bvid}&qn=80&type=&otype=json&fourk=1&fnver=0&fnval=4048'
-        player: str = self.session.get(player_url).text
-        player_dict: dict = json.loads(player)
-        base_url_dict: dict = player_dict["data"]["dash"]["video"][0]
-        base_url: str = base_url_dict['baseUrl']
-        return base_url
+    def send_request(self, url: str) -> Union[Response, Response]:
+        response: Union[Response, Response] = requests.get(url=url, headers=self.headers)
+        return response
 
-    def get_one_video(self, base_url: str):
-        response: Union[Response, Response] = self.session.get(base_url, headers=self.headers, stream=True)
-        with open('aaa.mp4', 'wb') as f:
-            f.write(response.content)
+    def get_video_data(self, html_data: str) -> list:
+        json_data: str = re.findall(r'<script>window.__playinfo__=(.*?)</script>', html_data)[0]
+        json_data_dict: dict = json.loads(json_data)
+        audio_url: str = json_data_dict["data"]["dash"]["audio"][0]["backupUrl"][0]
+        video_url: str = json_data_dict["data"]["dash"]["video"][0]["backupUrl"][0]
+        video_data: list = [audio_url, video_url]
+        return video_data
+
+    def save_data(self, file_name: str, audio_url: str, video_url: str) -> None:
+        print("正在下载 " + file_name + "的音频...")
+        audio_data: bytes = self.send_request(audio_url).content
+        print("完成下载 " + file_name + "的音频！")
+        print("正在下载 " + file_name + "的视频...")
+        video_data: bytes = self.send_request(video_url).content
+        print("完成下载 " + file_name + "的视频！")
+        with open(file_name + ".mp3", "wb") as f:
+            f.write(audio_data)
+        with open(file_name + ".mp4", "wb") as f:
+            f.write(video_data)
+
+    @retry()
+    def get_video(self, url, filename):
+        try:
+            html_data: str = self.send_request(url).text
+            video_data: list = self.get_video_data(html_data)
+            self.save_data(filename, video_data[0], video_data[1])
+        except:
+            raise Exception
+        return video_data
+
+    def merge_output_video(self, in_audio_name: str, in_video_name: str, out_video_name: str) -> None:
+        print(f'开始合并{in_audio_name}&&{in_video_name}--->{out_video_name}')
+        COMMAND = f'ffmpeg -i "{in_audio_name}.mp4" -i "{in_video_name}.mp3" -c:v copy -c:a aac -strict experimental "{out_video_name}.mp4"'
+        subprocess.Popen(COMMAND, shell=True)
+        print(f'视频{out_video_name}合并完成')
+        # return p
+
+    # def delete_temp_file(self, file_dir: str) -> None:
+    #     os.remove(file_dir)
+    #
+    # def delete_temp_playlist(self):
+    #     print('开始删除临时文件')
+    #     playlist_content: List[Dict] = self.plsylist_info
+    #     for item in playlist_content:
+    #         file_name: str = item['part']
+    #         temp_audio_name: str = file_name + '.mp3'
+    #         self.delete_temp_file(temp_audio_name)
+    #         temp_video_name: str = file_name + '.mp4'
+    #         self.delete_temp_file(temp_video_name)
+    #         print(f'临时文件{file_name}已删除')
+
+    def get_playlist_videos(self):
+        print('视频下载工作开始，请耐心等候。。。')
+        playlist_content: List[Dict] = self.plsylist_info
+        for item in playlist_content:
+            url: str = item['page']
+            file_name: str = item['part']
+            print(file_name)
+            self.get_video(url, file_name)
+            out_video_name: str = f'{file_name}_merged'
+            self.merge_output_video(file_name, file_name, out_video_name)
+            sleep_time: int = randint(1, 15)
+            sleep(sleep_time)
+            print(f'视频{file_name}下载合并完成，当前进度为{playlist_content.index(item) + 1}/{len(playlist_content)}')
+            print('-------------------------------------------------')
+        print('=========================所有视频下载合成完毕=========================')
+
+    # def get_playlist_videos(self):
+    #     self.get_videos()
+    #     self.delete_temp_playlist()

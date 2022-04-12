@@ -3,7 +3,7 @@ from typing import Any, List, Dict,Tuple
 import requests
 from requests import Response
 
-class SubtitleLoader(object):
+class PlaylistSubtitleLoader(object):
     '''
         字幕json格式链接：https://i0.hdslb.com/bfs/subtitle/b3eaf7b000edc13a0ff94b7335201fe9e01b61fe.json
         https://api.bilibili.com/x/player/v2?cid=542890058&aid=467084764&bvid=BV1KL411K7cH   需要cid，aid，bivid，
@@ -46,7 +46,7 @@ class SubtitleLoader(object):
             cid_part_order_list.append(part_dict)
         return (aid, cid_part_order_list)
 
-    def get_json_subtitle(self) -> None:
+    def get_playlist_json_subtitles(self) -> None:
         aid, cid_part_order_list = self.get_video_info()
 
         for cid_part_order_dict in cid_part_order_list:
