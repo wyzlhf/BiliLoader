@@ -80,9 +80,10 @@ class PlaylistVideoLoader(object):
     def merge_output_video(self, in_audio_name: str, in_video_name: str, out_video_name: str) -> None:
         print(f'开始合并{in_audio_name}&&{in_video_name}--->{out_video_name}')
         COMMAND = f'ffmpeg -i "{in_audio_name}.mp4" -i "{in_video_name}.mp3" -c:v copy -c:a aac -strict experimental "{out_video_name}.mp4"'
-        subprocess.Popen(COMMAND, shell=True)
+        process=subprocess.Popen(COMMAND, shell=True)
+        process.wait()
         print(f'视频{out_video_name}合并完成')
-        # return p
+        return
 
     # def delete_temp_file(self, file_dir: str) -> None:
     #     os.remove(file_dir)
