@@ -9,6 +9,7 @@ import os
 from tenacity import retry
 from time import sleep
 from random import randint
+from utils import delete_temp_audio_and_video,rename_merged_video
 
 
 class SpaceAndChannelVideoLoader(object):
@@ -77,6 +78,7 @@ class PlaylistVideoLoader(object):
             raise Exception
         return video_data
 
+    # FFmpeg这个东西经常报错，很不好用，下面试一下使用moviepy的方法
     def merge_output_video(self, in_audio_name: str, in_video_name: str, out_video_name: str) -> None:
         print(f'开始合并{in_audio_name}&&{in_video_name}--->{out_video_name}')
         COMMAND = f'ffmpeg -i "{in_audio_name}.mp4" -i "{in_video_name}.mp3" -c:v copy -c:a aac -strict experimental "{out_video_name}.mp4"'
@@ -84,6 +86,8 @@ class PlaylistVideoLoader(object):
         process.wait()
         print(f'视频{out_video_name}合并完成')
         return
+    # def merge_video_and_audio(self,in_audio_name: str, in_video_name: str, out_video_name: str) -> None:
+    #     ...
 
     # def delete_temp_file(self, file_dir: str) -> None:
     #     os.remove(file_dir)
@@ -109,9 +113,16 @@ class PlaylistVideoLoader(object):
             self.get_video(url, file_name)
             out_video_name: str = f'{file_name}_merged'
             self.merge_output_video(file_name, file_name, out_video_name)
+            print(f'视频{file_name}下载合并完成，当前进度为{playlist_content.index(item) + 1}/{len(playlist_content)}')
+
             sleep_time: int = randint(1, 15)
             sleep(sleep_time)
-            print(f'视频{file_name}下载合并完成，当前进度为{playlist_content.index(item) + 1}/{len(playlist_content)}')
+            delete_temp_audio_and_video(f'{file_name}.mp3')
+            print(f'删除临时文件{file_name}.mp3')
+            delete_temp_audio_and_video(f'{file_name}.mp4')
+            print(f'删除临时文件{file_name}.mp4')
+            rename_merged_video(f'{out_video_name}.mp4',f'{file_name}.mp4')
+            print(f'文件重命名成功，重命名后的文件名为：{file_name}.mp4')
             print('-------------------------------------------------')
         print('=========================所有视频下载合成完毕=========================')
 
