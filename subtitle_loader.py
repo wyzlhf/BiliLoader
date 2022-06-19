@@ -7,19 +7,12 @@ class PlaylistSubtitleLoader(object):
     '''
         字幕json格式链接：https://i0.hdslb.com/bfs/subtitle/b3eaf7b000edc13a0ff94b7335201fe9e01b61fe.json
         https://api.bilibili.com/x/player/v2?cid=542890058&aid=467084764&bvid=BV1KL411K7cH   需要cid，aid，bivid，
-
         然后，https://api.bilibili.com/x/player/pagelist?bvid=BV1KL411K7cH&jsonp=jsonp   里面有cid
         ###https://api.bilibili.com/x/player/pagelist?bvid=BV1KL411K7cH&jsonp=jsonp     这里可以获取playlist的所有cid
-
-
-
         https://api.bilibili.com/x/web-interface/view/detail?bvid=BV1KL411K7cH&aid=467084764&need_operation_card=1
         &web_rm_repeat=1&need_elec=1&out_referer=https%3A%2F%2Fwww.bilibili.com%2F
-
         此处可以获取整个包括playlist的该页面总览信息，其中包括推荐列表
-
         目前是使用手动也就是人肉的方式判断是否有字幕，如果改进可以加上自动判断是否存在字幕的逻辑
-
         '''
 
     def __init__(self, bvid: str) -> None:
@@ -57,14 +50,20 @@ class PlaylistSubtitleLoader(object):
             content_dict: dict = json.loads(content_str)
             # 从此处开始如果没有字幕会报错
             try:
-                subtitle_url: str = 'https:' + content_dict['data']['subtitle']['subtitles'][0]['subtitle_url']
-                # subtitle_url: str = 'https:' + subtitle_url
-                json_content_dict: dict = requests.get(subtitle_url).json()
-                json_content_str: str = json.dumps(json_content_dict)
-                with open(cid_part_order_dict['part'] + '.json', 'a') as json_file:
-                    print('正在写入json文件：', cid_part_order_dict['part'])
-                    json_file.write(json_content_str)
-                    print(f'第{cid_part_order_list.index(cid_part_order_dict) + 1}/{len(cid_part_order_list)}个字幕文件下载完成')
-                    print('---------------------------------------------')
+                subtitle_list_len=len(content_dict['data']['subtitle']['subtitles'])
+                for i in range(subtitle_list_len):
+                    subtitle_url: str = 'https:' + content_dict['data']['subtitle']['subtitles'][i]['subtitle_url']
+                    subtitle_type:str=content_dict['data']['subtitle']['subtitles'][i]["lan"]
+                    # subtitle_url: str = 'https:' + subtitle_url
+                    json_content_dict: dict = requests.get(subtitle_url).json()
+                    json_content_str: str = json.dumps(json_content_dict)
+                    subtitle_title:str=f'P{cid_part_order_list.index(cid_part_order_dict) + 1}-{cid_part_order_dict["part"]}.{subtitle_type}.json'
+                    with open(subtitle_title, 'a') as json_file:
+                    # with open(cid_part_order_dict['part'] + '.json', 'a') as json_file:
+                    #     print('正在写入json文件：', cid_part_order_dict['part'])
+                        print('正在写入json文件：', subtitle_title)
+                        json_file.write(json_content_str)
+                        print(f'第{cid_part_order_list.index(cid_part_order_dict) + 1}/{len(cid_part_order_list)}个字幕文件下载完成')
+                        print('---------------------------------------------')
             except:
                 print('该视频集没有字幕，请您再次确认')
