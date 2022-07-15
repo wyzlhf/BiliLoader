@@ -115,14 +115,16 @@ class PlaylistVideoLoader(object):
             self.merge_output_video(file_name, file_name, out_video_name)
             print(f'视频{file_name}下载合并完成，当前进度为{playlist_content.index(item) + 1}/{len(playlist_content)}')
 
-            sleep_time: int = randint(1, 15)
+            sleep_time: int = randint(1, 50)
             sleep(sleep_time)
             delete_temp_audio_and_video(f'{file_name}.mp3')
             print(f'删除临时文件{file_name}.mp3')
             delete_temp_audio_and_video(f'{file_name}.mp4')
             print(f'删除临时文件{file_name}.mp4')
-            rename_merged_video(f'{out_video_name}.mp4',f'{file_name}.mp4')
-            print(f'文件重命名成功，重命名后的文件名为：{file_name}.mp4')
+            # 重新命名一下标题，主要是加上了序号，因为有些视频本身没有序号，找不到次序了，但是有些视频有，就会出现重复序号
+            nature_index=playlist_content.index(item)+1
+            rename_merged_video(f'{out_video_name}.mp4',f'P-{nature_index} {file_name}.mp4')
+            print(f'文件重命名成功，重命名后的文件名为：P-{nature_index} {file_name}.mp4')
             print('-------------------------------------------------')
         print('=========================所有视频下载合成完毕=========================')
 
