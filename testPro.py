@@ -1,0 +1,72 @@
+import subprocess
+
+import requests
+
+archive_list:list = [
+    {'aid': 557744610, 'bvid': 'BV1je4y1o7yX', 'ctime': 1662121298, 'duration': 413, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662121298,
+     'stat': {'view': 563}, 'state': 0, 'title': 'fastapi 01 - hello world', 'ugc_pay': 0},
+    {'aid': 645243049, 'bvid': 'BV13Y4y1M7Wj', 'ctime': 1662125580, 'duration': 614, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662125580,
+     'stat': {'view': 226}, 'state': 0, 'title': 'fastapi 02 - 文档界面加载慢', 'ugc_pay': 0},
+    {'aid': 515184762, 'bvid': 'BV13g411S7PV', 'ctime': 1662131027, 'duration': 2532, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662131027,
+     'stat': {'view': 356}, 'state': 0, 'title': 'fastapi 03-1 - 接收前端传过来的信息', 'ugc_pay': 0},
+    {'aid': 985187274, 'bvid': 'BV1dt4y1j7GD', 'ctime': 1662132702, 'duration': 608, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662132702,
+     'stat': {'view': 152}, 'state': 0, 'title': 'fastapi03-2 - 通过Request对象拿参数', 'ugc_pay': 0},
+    {'aid': 217737600, 'bvid': 'BV14a41137uc', 'ctime': 1662204600, 'duration': 418, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662204600,
+     'stat': {'view': 152}, 'state': 0, 'title': 'fastapi 04 路由分组', 'ugc_pay': 0},
+    {'aid': 217671789, 'bvid': 'BV1Ka41137q5', 'ctime': 1662206926, 'duration': 800, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662206925,
+     'stat': {'view': 135}, 'state': 0, 'title': 'fastapi 05 依赖的简单演示', 'ugc_pay': 0},
+    {'aid': 985203884, 'bvid': 'BV1gt4y177Ju', 'ctime': 1662206872, 'duration': 214, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662206872,
+     'stat': {'view': 108}, 'state': 0, 'title': 'fastapi 06 路径操作装饰器依赖项', 'ugc_pay': 0},
+    {'aid': 645157745, 'bvid': 'BV1vY4y1T7Jb', 'ctime': 1662208457, 'duration': 502, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662208457,
+     'stat': {'view': 113}, 'state': 0, 'title': 'fastapi 07 把一个类作为依赖项来使用', 'ugc_pay': 0},
+    {'aid': 387720441, 'bvid': 'BV1Ad4y1X744', 'ctime': 1662211291, 'duration': 1452, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662211290,
+     'stat': {'view': 187}, 'state': 0, 'title': 'fastapi 08-1 注册功能的简单实现', 'ugc_pay': 0},
+    {'aid': 900233529, 'bvid': 'BV1qP4y1o78M', 'ctime': 1662212890, 'duration': 908, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662212890,
+     'stat': {'view': 264}, 'state': 0, 'title': 'fastapi 08-2 登陆功能的简单实现', 'ugc_pay': 0},
+    {'aid': 430216552, 'bvid': 'BV1BG411G77N', 'ctime': 1662215071, 'duration': 1212, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662215071,
+     'stat': {'view': 104}, 'state': 0, 'title': 'fastapi 08-3 查看个人信息', 'ugc_pay': 0},
+    {'aid': 260159809, 'bvid': 'BV1de411g7gh', 'ctime': 1662215882, 'duration': 548, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662215882,
+     'stat': {'view': 130}, 'state': 0, 'title': 'fastapi 08-4 抽出token认证依赖', 'ugc_pay': 0},
+    {'aid': 645178136, 'bvid': 'BV1QY4y1T7uf', 'ctime': 1662217107, 'duration': 1004, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662217107,
+     'stat': {'view': 129}, 'state': 0, 'title': 'fastapi 08-5 实现文档界面的认证按钮', 'ugc_pay': 0},
+    {'aid': 260312844, 'bvid': 'BV1ce411u75L', 'ctime': 1662719720, 'duration': 870, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662719720,
+     'stat': {'view': 326}, 'state': 0, 'title': 'fastapi 08-6 使用真正的 hash库、jwt库', 'ugc_pay': 0},
+    {'aid': 472765069, 'bvid': 'BV15K411f7Rn', 'ctime': 1662719842, 'duration': 191, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1662719842,
+     'stat': {'view': 116}, 'state': 0, 'title': 'fastapi 08-7 开发调试接口分离', 'ugc_pay': 0},
+    {'aid': 560446829, 'bvid': 'BV1be4y1a7JS', 'ctime': 1662996278, 'duration': 723, 'interactive_video': False,
+     'pic': 'http://i2.hdslb.com/bfs/archive/682d0614945f229403c22f98d987f9d7e09e9737.jpg', 'pubdate': 1662996277,
+     'stat': {'view': 106}, 'state': 0, 'title': 'fastapi 09-1 中间件的简单演示', 'ugc_pay': 0},
+    {'aid': 942963635, 'bvid': 'BV13W4y1i7Lm', 'ctime': 1662997529, 'duration': 661, 'interactive_video': False,
+     'pic': 'http://i2.hdslb.com/bfs/archive/682d0614945f229403c22f98d987f9d7e09e9737.jpg', 'pubdate': 1662997529,
+     'stat': {'view': 89}, 'state': 0, 'title': 'fastapi 09-2 中间件的简单演示', 'ugc_pay': 0},
+    {'aid': 345430901, 'bvid': 'BV1bd4y13754', 'ctime': 1662997819, 'duration': 225, 'interactive_video': False,
+     'pic': 'http://i2.hdslb.com/bfs/archive/682d0614945f229403c22f98d987f9d7e09e9737.jpg', 'pubdate': 1662997819,
+     'stat': {'view': 175}, 'state': 0, 'title': 'fastapi 10-1 后台任务的简单演示', 'ugc_pay': 0},
+    {'aid': 602988057, 'bvid': 'BV1wB4y1n78s', 'ctime': 1662999860, 'duration': 1085, 'interactive_video': False,
+     'pic': 'http://i2.hdslb.com/bfs/archive/682d0614945f229403c22f98d987f9d7e09e9737.jpg', 'pubdate': 1662999860,
+     'stat': {'view': 199}, 'state': 0, 'title': 'fastapi 10-2 后台任务类', 'ugc_pay': 0},
+    {'aid': 560976641, 'bvid': 'BV1re4y1b7LP', 'ctime': 1664029245, 'duration': 3267, 'interactive_video': False,
+     'pic': 'http://i1.hdslb.com/bfs/archive/84a9372d69e7bf7fe23428ad8d7e19dee3b66093.jpg', 'pubdate': 1664029244,
+     'stat': {'view': 230}, 'state': 0, 'title': 'fastapi 项目目录结构', 'ugc_pay': 0}]
+for item in archive_list:
+    bvid:str=item['bvid']
+    base_url:str='https://www.bilibili.com/video/'
+    bvid_url:str=base_url+bvid
+    cmd:str='you-get '+bvid_url
+    print(cmd)
+    # subprocess.Popen(cmd).communicate()
