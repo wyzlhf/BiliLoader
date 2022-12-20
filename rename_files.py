@@ -31,8 +31,8 @@ def rename_file_name_according_location(file_path:str,location:int,replaced_str:
             os.rename(file_name_with_path,new_file_name_with_path)
 
 if __name__ == '__main__':
-    path = r"D:\VIDEO\【西南大学】孟凡君教授逐句精讲《周易本义》"
-    replaced_str: str = '【西南大学】孟凡君教授逐句精讲《周易本义》 ('
+    path = r"D:\VIDEO\希勒【金融市场】【18课全双语高清】"
+    replaced_str: str = '希勒【金融市场】【18课全双语高清】 ('
     # want_str:str='.zh-CN'
     the_fist_rename(
         replaced_str,

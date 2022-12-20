@@ -50,10 +50,22 @@ class SubtitleConverter(object):
                 srt.write(content + '\n')
         print(f'{srt_dir_str}转换完成。。。')
         print('---------------------------------------------------')
-
+def convert_json_subtitle_to_srt_subtitle(path:str)->None:
+    # path: str = '.'
+    files_list: List[str] = os.listdir(path)
+    json_files_list: list = []
+    for file in files_list:
+        if file[-4:] == 'json':
+            json_files_list.append(file)
+    for file_name in json_files_list:
+        full_file_name: str = path + '\\' + file_name
+        print(full_file_name)
+        sc = SubtitleConverter(full_file_name)
+        # print(full_file_name)
+        sc.convert_subtitle()
 
 if __name__ == '__main__':
-    path: str = 'D:\CODE\PYTHON\sub'
+    path: str = '.'
     files_list: List[str] = os.listdir(path)
     json_files_list: list = []
     for file in files_list:
