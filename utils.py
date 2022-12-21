@@ -47,4 +47,7 @@ def delete_subtitle_with_string_in_title(path: str = './', string_in_title: str 
 
 
 if __name__ == '__main__':
-    delete_subtitle_with_string_in_title('D:\VIDEO\希勒【金融市场】【18课全双语高清】', '.en-US')
+    delete_subtitle_with_string_in_title(
+        'D:\VIDEO\【44集全】全英文速成社会学-中英cc外挂字幕',
+        '.zh-CN'
+    )

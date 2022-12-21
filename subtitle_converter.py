@@ -42,12 +42,12 @@ class SubtitleConverter(object):
 
             content: str = item['content']
             index = content_body.index(item) + 1
-            formed_time = start_time + '-->' + end_time
+            formed_time = start_time + ' --> ' + end_time
 
             with open(srt_dir_str, 'a', encoding='utf-8') as srt:
                 srt.write(str(index) + '\n')
                 srt.write(formed_time + '\n')
-                srt.write(content + '\n')
+                srt.write(content + '\n\n')
         print(f'{srt_dir_str}转换完成。。。')
         print('---------------------------------------------------')
 def convert_json_subtitle_to_srt_subtitle(path:str)->None:

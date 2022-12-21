@@ -46,8 +46,8 @@ def get_number_of_pages(url: str) -> int:
 
 
 if __name__ == '__main__':
-    url:str='https://space.bilibili.com/20942052/channel/collectiondetail?sid=273783'
-    archives_list = get_bvid_of_space_seriesdetail_list(url,num_pages=2)
+    url: str = 'https://space.bilibili.com/1159991219/channel/collectiondetail?sid=897241'
+    archives_list = get_bvid_of_space_seriesdetail_list(url, num_pages=2)
     print(archives_list)
     for item in archives_list:
         bvid: str = item['bvid']
