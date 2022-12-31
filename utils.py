@@ -48,6 +48,6 @@ def delete_subtitle_with_string_in_title(path: str = './', string_in_title: str 
 
 if __name__ == '__main__':
     delete_subtitle_with_string_in_title(
-        'D:\VIDEO\【44集全】全英文速成社会学-中英cc外挂字幕',
-        '.zh-CN'
+        'D:\VIDEO\【NFT开发课】学习构建 Web3.0去中心化 NFT 应用市场参与NFT的制作 收藏与交易！',
+        '.en-US'
     )
