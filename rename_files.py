@@ -31,8 +31,8 @@ def rename_file_name_according_location(file_path:str,location:int,replaced_str:
             os.rename(file_name_with_path,new_file_name_with_path)
 
 if __name__ == '__main__':
-    path = r"D:\VIDEO\深度学习之TensorFlow高级实战"
-    replaced_str: str = '《深度学习之TensorFlow高级实战》 ('
+    path = r"D:\VIDEO\Go语言微服务小程序实战项目分布式微服务构架"
+    replaced_str: str = 'Go语言微服务小程序实战项目分布式微服务构架 ('
     # want_str:str='.zh-CN'
     the_fist_rename(
         replaced_str,

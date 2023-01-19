@@ -46,8 +46,24 @@ def delete_subtitle_with_string_in_title(path: str = './', string_in_title: str 
             print('成功删除文件：', file_name)
 
 
+def delete_subtitle_with_string_in_title_list(path: str, str_list: List[str]) -> None:
+    file_names_list: List[str] = os.listdir(path)
+    for str_name in str_list:
+        for file_name in file_names_list:
+            if str_name in file_name:
+                full_name: str = path + '\\' + file_name
+                os.remove(full_name)
+                print('成功删除文件：', file_name)
+
+
 if __name__ == '__main__':
-    delete_subtitle_with_string_in_title(
-        'D:\VIDEO\【NFT开发课】学习构建 Web3.0去中心化 NFT 应用市场参与NFT的制作 收藏与交易！',
-        '.en-US'
-    )
+    # delete_subtitle_with_string_in_title(
+    #     'D:\VIDEO\【Udemy付费课程】Microservices with Node JS and React\【Udemy付费课程】Microservices with Node JS and React（P3）',
+    #     # '.ai-zh'
+    #     '.zh-CN'
+    #     # '.zh-Hans'
+    #     # '.ai-en'
+    # )
+    path: str = 'D:\VIDEO\【Udemy付费课程】Microservices with Node JS and React\【Udemy付费课程】Microservices with Node JS and React（P3）'
+    str_list: List[str] = ['.ai-zh', '.zh-CN', '.zh-Hans', '.ai-en']
+    delete_subtitle_with_string_in_title_list(path, str_list)

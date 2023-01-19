@@ -65,7 +65,7 @@ def convert_json_subtitle_to_srt_subtitle(path:str)->None:
         sc.convert_subtitle()
 
 if __name__ == '__main__':
-    path: str = '.'
+    path: str = 'D:\VIDEO\以太坊 & Solidity：完整的开发者指南\以太坊 & Solidity：完整的开发者指南（下）【中英字幕】'
     files_list: List[str] = os.listdir(path)
     json_files_list: list = []
     for file in files_list:

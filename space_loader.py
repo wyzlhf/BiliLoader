@@ -47,8 +47,8 @@ def get_number_of_pages(url: str) -> int:
 
 
 if __name__ == '__main__':
-    url: str = 'https://space.bilibili.com/1803865534/channel/collectiondetail?sid=862382'   #2 pages
-    archives_list = get_bvid_of_space_seriesdetail_list(url, num_pages=2)
+    url: str = 'https://space.bilibili.com/592250247/channel/collectiondetail?sid=728654'   #1 pages
+    archives_list = get_bvid_of_space_seriesdetail_list(url, num_pages=1)
     # print(archives_list)
     # 此处开始是正常下载
     for item in archives_list:
