@@ -9,8 +9,9 @@ import os
 from tenacity import retry
 from time import sleep
 from random import randint
-from utils import delete_temp_audio_and_video,rename_merged_video
-from typing import List,Dict
+from utils import delete_temp_audio_and_video, rename_merged_video
+from typing import List, Dict
+
 
 class SpaceAndChannelVideoLoader(object):
     ...
@@ -82,10 +83,11 @@ class PlaylistVideoLoader(object):
     def merge_output_video(self, in_audio_name: str, in_video_name: str, out_video_name: str) -> None:
         print(f'开始合并{in_audio_name}&&{in_video_name}--->{out_video_name}')
         COMMAND = f'ffmpeg -i "{in_audio_name}.mp4" -i "{in_video_name}.mp3" -c:v copy -c:a aac -strict experimental "{out_video_name}.mp4"'
-        process=subprocess.Popen(COMMAND, shell=True)
+        process = subprocess.Popen(COMMAND, shell=True)
         process.wait()
         print(f'视频{out_video_name}合并完成')
         return
+
     # def merge_video_and_audio(self,in_audio_name: str, in_video_name: str, out_video_name: str) -> None:
     #     ...
 
@@ -110,6 +112,10 @@ class PlaylistVideoLoader(object):
             url: str = item['page']
             file_name: str = item['part']
             print(file_name)
+            if ":" in file_name:
+                file_name = file_name.replace(":", "：")
+            if '|' in file_name:
+                file_name=file_name.replace('|','-')
             self.get_video(url, file_name)
             out_video_name: str = f'{file_name}_merged'
             self.merge_output_video(file_name, file_name, out_video_name)
@@ -122,10 +128,10 @@ class PlaylistVideoLoader(object):
             delete_temp_audio_and_video(f'{file_name}.mp4')
             print(f'删除临时文件{file_name}.mp4')
             # 重新命名一下标题，主要是加上了序号，因为有些视频本身没有序号，找不到次序了，但是有些视频有，就会出现重复序号
-            nature_index:int=playlist_content.index(item)+1
+            nature_index: int = playlist_content.index(item) + 1
             # rename_merged_video(f'{out_video_name}.mp4', f'{file_name}.mp4')
             # print(f'文件重命名成功，重命名后的文件名为：{file_name}.mp4')
-            rename_merged_video(f'{out_video_name}.mp4',f'P{nature_index}-{file_name}.mp4')
+            rename_merged_video(f'{out_video_name}.mp4', f'P{nature_index}-{file_name}.mp4')
             print(f'文件重命名成功，重命名后的文件名为：P{nature_index}-{file_name}.mp4')
             print('-------------------------------------------------')
         print('=========================所有视频下载合成完毕=========================')

@@ -14,7 +14,7 @@ def delete_temp_audio_and_video(path: str):
 
 def rename_merged_video(old_path: str, new_path: str):
     if os.path.exists(old_path):
-        os.rename(old_path, new_path)
+        os.replace(old_path, new_path)
         # print(f'文件*{old_path}*重名成功，重命名后的文件名为*{new_path}8')
     else:
         print("The file does not exist")
@@ -64,6 +64,6 @@ if __name__ == '__main__':
     #     # '.zh-Hans'
     #     # '.ai-en'
     # )
-    path: str = 'D:\VIDEO\【Udemy付费课程】Microservices with Node JS and React\【Udemy付费课程】Microservices with Node JS and React（P3）'
+    path: str = r'D:\VIDEO\Udemy - Building Modern Web Applications with Go (Golang) 2022-7\Udemy - Building Modern Web Applications with Go (Golang) 2022-7（16-21）完结'
     str_list: List[str] = ['.ai-zh', '.zh-CN', '.zh-Hans', '.ai-en']
     delete_subtitle_with_string_in_title_list(path, str_list)

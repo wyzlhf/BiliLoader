@@ -31,12 +31,13 @@ def rename_file_name_according_location(file_path:str,location:int,replaced_str:
             os.rename(file_name_with_path,new_file_name_with_path)
 
 if __name__ == '__main__':
-    path = r"D:\VIDEO\Go语言微服务小程序实战项目分布式微服务构架"
-    replaced_str: str = 'Go语言微服务小程序实战项目分布式微服务构架 ('
+    path = r"D:\VIDEO\【公开课】耶鲁大学：死亡哲学课"
+    replaced_str: str = '【公开课】耶鲁大学：人生哲学课 ('
     # want_str:str='.zh-CN'
     the_fist_rename(
         replaced_str,
         # want_str
     )
     the_second_rename()
+    print("完成名称修改！")
     # rename_file_name_according_location(path,6)
