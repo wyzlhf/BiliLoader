@@ -1,7 +1,8 @@
 import json
-from typing import Any, List, Dict,Tuple
+from typing import Any, List, Dict, Tuple
 import requests
 from requests import Response
+
 
 class PlaylistSubtitleLoader(object):
     '''
@@ -50,20 +51,23 @@ class PlaylistSubtitleLoader(object):
             content_dict: dict = json.loads(content_str)
             # 从此处开始如果没有字幕会报错
             try:
-                subtitle_list_len=len(content_dict['data']['subtitle']['subtitles'])
+                subtitle_list_len = len(content_dict['data']['subtitle']['subtitles'])
                 for i in range(subtitle_list_len):
                     subtitle_url: str = 'https:' + content_dict['data']['subtitle']['subtitles'][i]['subtitle_url']
-                    subtitle_type:str=content_dict['data']['subtitle']['subtitles'][i]["lan"]
-                    # subtitle_url: str = 'https:' + subtitle_url
+                    subtitle_type: str = content_dict['data']['subtitle']['subtitles'][i]["lan"]
                     json_content_dict: dict = requests.get(subtitle_url).json()
                     json_content_str: str = json.dumps(json_content_dict)
-                    subtitle_title:str=f'P{cid_part_order_list.index(cid_part_order_dict) + 1}-{cid_part_order_dict["part"]}.{subtitle_type}.json'
+                    subtitle_title: str = f'P{cid_part_order_list.index(cid_part_order_dict) + 1}-' \
+                                          f'{cid_part_order_dict["part"]}.{subtitle_type}.json'
+                    if ":" in subtitle_title:
+                        subtitle_title = subtitle_title.replace(":", "：")
+                    if '|' in subtitle_title:
+                        subtitle_title = subtitle_title.replace('|', '-')
                     with open(subtitle_title, 'a') as json_file:
-                    # with open(cid_part_order_dict['part'] + '.json', 'a') as json_file:
-                    #     print('正在写入json文件：', cid_part_order_dict['part'])
                         print('正在写入json文件：', subtitle_title)
                         json_file.write(json_content_str)
-                        print(f'第{cid_part_order_list.index(cid_part_order_dict) + 1}/{len(cid_part_order_list)}个字幕文件下载完成')
+                        print(
+                            f'第{cid_part_order_list.index(cid_part_order_dict) + 1}/{len(cid_part_order_list)}个字幕文件下载完成')
                         print('---------------------------------------------')
             except:
                 print('该视频集没有字幕，请您再次确认')
